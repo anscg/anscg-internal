@@ -36,7 +36,36 @@
 	<FilePond
         bind:this={pond}
         {name}
-        server="/api/upload/JACP2425FirstPitch"
+		server={{
+			process: async (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+				//get presigned url from "api/upload/JACP2425FirstPitch"
+				//upload file to the presigned url
+				const presignurl = await fetch("/api/upload/JACP2425FirstPitch", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: file.name,
+				});
+				if (presignurl.ok) {
+					const url = await presignurl.text();
+					const uploadRequest = new Request(url, {
+						method: "PUT",
+						mode: 'cors',
+						cache: 'no-store',
+						body: file.arrayBuffer(),
+					});
+					const response = await fetch(uploadRequest);
+					if (response.ok) {
+						console.log("File uploaded successfully");
+					} else {
+						console.error("Failed to upload file");
+					}
+				} else {
+					console.error("Failed to get presigned URL");
+				}
+			}
+		}}
         allowMultiple={false}
         oninit={handleInit}
         onaddfile={handleAddFile}

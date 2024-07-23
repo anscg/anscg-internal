@@ -11,7 +11,7 @@
 	</main>
 
 	<footer>
-		<p>Internal systems made by <a href="https://www.instagram.com/kryptic.icqm/">Kryptic Sofftworks</a>.</p>
+		<p>Internal systems made by <a href="https://www.instagram.com/kryptic.icqm/">Kryptic Softworks</a>.</p>
 	</footer>
 </div>
 
