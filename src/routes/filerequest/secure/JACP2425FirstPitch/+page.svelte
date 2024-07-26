@@ -5,17 +5,11 @@
 	registerPlugin(FilePondPluginFileValidateType);
 
 	let pond;
+	let submitButton;
 	let name = 'filepond';
 
-	
-
-
-	function handleInit() {
-		console.log('FilePond has initialised');
-	}
-
-	function handleAddFile(err, fileItem) {
-		console.log('A file has been added', fileItem);
+	function handleProcessFiles() {
+		submitButton.disabled = false;
 	}
 
 </script>
@@ -38,37 +32,62 @@
         {name}
 		server={{
 			process: async (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
-				//get presigned url from "api/upload/JACP2425FirstPitch"
-				//upload file to the presigned url
 				const presignurl = await fetch("/api/upload/JACP2425FirstPitch", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: file.name,
+					body: crypto.randomUUID() + file.name,
 				});
 				if (presignurl.ok) {
 					const url = await presignurl.text();
-					const uploadRequest = new Request(url, {
-						method: "PUT",
-						mode: 'cors',
-						cache: 'no-store',
-						body: file.arrayBuffer(),
-					});
-					const response = await fetch(uploadRequest);
-					if (response.ok) {
-						console.log("File uploaded successfully");
-					} else {
-						console.error("Failed to upload file");
-					}
+					//const uploadRequest = new Request(url, {
+					//	method: "POST",
+					//	headers: {
+					//		"Content-Type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+					//	},
+					//	mode: 'cors',
+					//	cache: 'no-store',
+					//	body: await file.arrayBuffer(),
+					//});
+					
+					const request = new XMLHttpRequest();
+            		request.open('PUT', url);
+					request.upload.onprogress = (e) => {
+                		progress(e.lengthComputable, e.loaded, e.total);
+            		};
+					request.onload = function () {
+		                if (request.status >= 200 && request.status < 300) {
+		                    load("200");
+		                } else {
+		                    error('oh no');
+		                }
+		            };
+
+					request.setRequestHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
+					request.send(await file.arrayBuffer());
+					
+					//const response = await fetch(uploadRequest);
+					//if (response.ok) {
+					//	console.log("File uploaded successfully");
+					//} else {
+					//	console.error("Failed to upload file");
+					//}
+					return {
+                		abort: () => {
+                		    request.abort();
+                		    abort();
+                		},
+            		};
+
 				} else {
 					console.error("Failed to get presigned URL");
+					abort();
 				}
 			}
 		}}
         allowMultiple={false}
-        oninit={handleInit}
-        onaddfile={handleAddFile}
+		onprocessfiles={handleProcessFiles}
 		acceptedFileTypes={[".pptx"]}
 		allowFileTypeValidation={false}
     />
@@ -77,7 +96,7 @@
 		Only <strong>PowerPoint Presentation (.pptx)</strong> files are accepted.
 	</h2>
 
-	<button class="button-20" disabled=true>Submit</button>
+	<button bind:this={submitButton} class="button-20" disabled=true onclick="location.href='/filerequest/SubmissionSuccess';">Submit</button>
 
 </section>
 
@@ -89,7 +108,16 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		flex: .8;
+		flex: .9;
+		animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) 2s forwards;
+		filter: blur(1rem);
+		scale: 1.3;
+		opacity: 0.1;
+	}
+
+	@keyframes fadeIn {
+	  0% { filter: blur(1rem); scale: 1.3; opacity: 0.8; }
+	  100% { filter: blur(0rem); scale: 1; opacity: 1; }
 	}
 
 	h1 {
@@ -105,7 +133,7 @@
 	  box-shadow: rgba(255, 255, 255, 0.15) 0 1px 0 inset,rgba(46, 54, 80, 0.075) 0 1px 1px;
 	  box-sizing: border-box;
 	  color: #FFFFFF;
-	  cursor: pointer;
+	  cursor: default;
 	  display: inline-block;
 	  font-family: Inter,sans-serif;
 	  font-size: 1rem;

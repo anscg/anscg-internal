@@ -10,7 +10,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const S3 = new S3Client({
   region: "apac",
-  endpoint: `https://internal.anscg.net`,
+  endpoint: `https://0209a511515ec19549aa187efd657844.r2.cloudflarestorage.com`,
   credentials: {
     accessKeyId: import.meta.env.VITE_ACCESS_KEY_ID,
     secretAccessKey: import.meta.env.VITE_SECRET_ACCESS_KEY,
@@ -31,6 +31,6 @@ export async function POST({ request }) {
     let signedurl
     //return a signed link from S3 bucket
     console.log()
-    signedurl = await getSignedUrl(S3, new GetObjectCommand({Bucket: 'bucket', Key: await streamToString(request.body)}), { expiresIn: 3600 })
+    signedurl = await getSignedUrl(S3, new PutObjectCommand({Bucket: 'anscg-internal', Key: await streamToString(request.body)}), { expiresIn: 3600 })
     return new Response(signedurl, { status: 200 });
 }
