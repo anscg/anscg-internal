@@ -15,8 +15,8 @@
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>File Submission</title>
+	<meta name="description" content="Anson Chung is requesting a file." />
 </svelte:head>
 
 <section>
