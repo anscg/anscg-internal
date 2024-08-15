@@ -9,7 +9,7 @@
 	</main>
 
 	<footer>
-		<p>Internal systems made by <a href="https://www.instagram.com/kryptic.icqm/">Kryptic Softworks</a>.</p>
+		<p>Internal systems made by <a href="https://www.instagram.com/kryptic.icqm/">Anson Chung</a>.</p>
 	</footer>
 </div>
 
